@@ -1,3 +1,2 @@
 all-corpora
-all-nltk
 popular
