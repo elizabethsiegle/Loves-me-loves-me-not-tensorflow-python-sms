@@ -131,7 +131,8 @@ net = tflearn.regression(net)
 model = tflearn.DNN(net)
 # Start training (apply gradient descent algorithm). epochs = # times the network will see all data
 model.fit(data, labels, n_epoch=1000, batch_size=16, show_metric=True)
-
+model.save('my_model.h5')
+new_model = tf.keras.models.load_model('my_model.h5')
 # method takes in a sentence + list of all words, returns data in form that  can be fed to tensorflow
 def clean_for_tf(text):
     input_words = tokenize_and_stem_text(word_tokenize(text))
@@ -148,10 +149,7 @@ def sms():
     resp = MessagingResponse()
     inbMsg = request.values.get('Body').lower().strip()
     # position of largest value: prediction
-    tensor = model.predict([clean_for_tf(inbMsg)])
+    tensor = new_model.predict([clean_for_tf(inbMsg)])
     resp.message(
         f'The message {inbMsg!r} corresponds to {binary_categories[np.argmax(tensor)]!r}.')
     return str(resp)
-
-if __name__ == "__main__":
-    app.run(debug=True)
