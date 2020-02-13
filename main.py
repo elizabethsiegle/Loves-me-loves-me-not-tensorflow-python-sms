@@ -164,5 +164,3 @@ def sms():
         f'The message {inbMsg!r} corresponds to {binary_categories[np.argmax(tensor)]!r}.')
     return str(resp)
 
-if __name__ == '__main__':
-    app.run(debug=True)
