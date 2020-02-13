@@ -141,7 +141,6 @@ net = tflearn.regression(net)
 model = tflearn.DNN(net)
 # Start training (apply gradient descent algorithm). epochs = # times the network will see all data
 model.fit(data, labels, n_epoch=1000, batch_size=16, show_metric=True)
-model.save('/content/drive/My Drive/data/saved_models/my_model.h5')
 # method takes in a sentence + list of all words, returns data in form that  can be fed to tensorflow
 
 
