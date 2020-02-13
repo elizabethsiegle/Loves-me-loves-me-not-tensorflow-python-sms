@@ -8,11 +8,14 @@ import random
 import json
 from twilio.twiml.messaging_response import MessagingResponse
 from flask import Flask, request
-    
+
+
 def open_file(file):
     with open(file, 'r') as f:
         data = json.load(f)
         return data
+
+
 data = open_file('data.json')
 contractions = {
     "aren't": "are not",
@@ -64,16 +67,21 @@ contractions = {
 }
 
 lemma = WordNetLemmatizer()
-def tokenize_and_stem_text(text): #stem each word in text
-    return [lemma.lemmatize(word.lower()) for word in text] 
+
+
+def tokenize_and_stem_text(text):  # stem each word in text
+    return [lemma.lemmatize(word.lower()) for word in text]
+
 
 # get a list of all categories to train for: loves_me, loves_me_not
 binary_categories = list(data.keys())
 training_words = []
 # a list of tuples with words in the sentence and category name
 json_data = []
-def read_training_data(data): #modify training_words
-    for category in data.keys(): 
+
+
+def read_training_data(data):  # modify training_words
+    for category in data.keys():
         for text in data[category]:
             for word in text.split():
                 if word.lower() in contractions:
@@ -84,6 +92,7 @@ def read_training_data(data): #modify training_words
             training_words.extend(word_tokenize(text))
             json_data.append((word_tokenize(text), category))
     return json_data
+
 
 # stem and lower each word and remove duplicates
 tokenize_and_stem_text(training_words)
@@ -104,12 +113,12 @@ for item in json_data:
             bag_vector.append(1)
         else:
             bag_vector.append(0)
-    out_row = list([0] * len(binary_categories)) #empty array for our output
+    out_row = list([0] * len(binary_categories))  # empty array for our output
     out_row[binary_categories.index(item[1])] = 1
     # our training set will contain a the bag of words model and the output row that tells
     # which category that bow belongs to.
     training.append([bag_vector, out_row])
-    
+
 # shuffle features,  turn into np.array bc tf takes in numpy array
 # random.shuffle(training)
 training = np.array(training)
@@ -123,25 +132,29 @@ print(f'labels {labels}')
 tf.reset_default_graph()
 # Build neural network: 3 layers. input_data layer is used for inputting (aka. feeding) data to a network. the input to your network has shape len(data[0])
 print(f'len(data[0] {len(data[0])}, {data[0]}')
-net = tflearn.input_data(shape=[None, len(data[0])]) #none = unknown dimension, so can change total # samples processed in batch
-net = tflearn.fully_connected(net, 32) #32 hidden units/neurons
-net = tflearn.fully_connected(net, len(labels[0]), activation='softmax') #softmax vs sigmoid: 
+# none = unknown dimension, so can change total # samples processed in batch
+net = tflearn.input_data(shape=[None, len(data[0])])
+net = tflearn.fully_connected(net, 32)  # 32 hidden units/neurons
+# softmax vs sigmoid:
+net = tflearn.fully_connected(net, len(labels[0]), activation='softmax')
 net = tflearn.regression(net)
 # Define model and setup tensorboard: DNN automatically performs NN classifier tasks like training, prediction
 model = tflearn.DNN(net)
 # Start training (apply gradient descent algorithm). epochs = # times the network will see all data
 model.fit(data, labels, n_epoch=1000, batch_size=16, show_metric=True)
-model.save('my_model.h5')
-new_model = tf.keras.models.load_model('my_model.h5')
+
 # method takes in a sentence + list of all words, returns data in form that  can be fed to tensorflow
+
+
 def clean_for_tf(text):
     input_words = tokenize_and_stem_text(word_tokenize(text))
-    bag_vector = [] #[0]*len(training_words)
+    bag_vector = [0]*len(training_words)
     for input_word in input_words:
         for ind, word in enumerate(training_words):
             if word == input_word:
                 bag_vector[ind] = 1
     return(np.array(bag_vector))
+
 
 app = Flask(__name__)
 @app.route("/sms", methods=['POST'])
@@ -149,7 +162,7 @@ def sms():
     resp = MessagingResponse()
     inbMsg = request.values.get('Body').lower().strip()
     # position of largest value: prediction
-    tensor = new_model.predict([clean_for_tf(inbMsg)])
+    tensor = model.predict([clean_for_tf(inbMsg)])
     resp.message(
         f'The message {inbMsg!r} corresponds to {binary_categories[np.argmax(tensor)]!r}.')
     return str(resp)
