@@ -1,1 +1,1 @@
-web: {python3 model.py & flask run  --without-threads & wait -n
+web: flask run  --without-threads & wait -n
