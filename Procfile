@@ -1,1 +1,1 @@
-web: flask run  --without-threads & wait -n
+web: python3 main.py

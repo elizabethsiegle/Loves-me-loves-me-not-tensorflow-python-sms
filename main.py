@@ -143,7 +143,6 @@ model = tflearn.DNN(net)
 model.fit(data, labels, n_epoch=1000, batch_size=16, show_metric=True)
 # method takes in a sentence + list of all words, returns data in form that  can be fed to tensorflow
 
-
 def clean_for_tf(text):
     input_words = tokenize_and_stem_text(word_tokenize(text))
     bag_vector = [0]*len(training_words)
@@ -164,3 +163,6 @@ def sms():
     resp.message(
         f'The message {inbMsg!r} corresponds to {binary_categories[np.argmax(tensor)]!r}.')
     return str(resp)
+
+if __name__ == '__main__':
+    app.run(debug=True)
