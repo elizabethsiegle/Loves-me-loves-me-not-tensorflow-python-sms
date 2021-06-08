@@ -15,7 +15,7 @@ Markdown==3.2
 MarkupSafe==1.1.1
 nltk==3.4.5
 numpy==1.16.4
-Pillow==7.0.0
+Pillow==8.2.0
 protobuf==3.11.3
 PyJWT==1.7.1
 pytz==2019.3
