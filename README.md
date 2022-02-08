@@ -11,3 +11,5 @@ export FLASK_ENV=development
 flask run  --without-threads
 ```
 Please ignore some of the commits and commit messages, it was a pain to deploy to Heroku because the TensorFlow model was computationally-intensive.
+
+![](https://countrush-prod.azurewebsites.net/l/badge/?repository=elizabethsiegle.Loves-me-loves-me-not-tensorflow-python-sms)
